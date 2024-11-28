@@ -1,4 +1,5 @@
 from collections import defaultdict
+import os
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.probability import FreqDist
@@ -11,16 +12,30 @@ def preprocess_data(file_path, vocab_size=5000):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read().lower()  # Read and lower case the text
 
-    tokens = word_tokenize(text)  # Tokenize the text
-    freq_dist = FreqDist(tokens)  # Frequency distribution of tokens
-    
-    # Limit vocabulary size
-    vocabulary = set([word for word, _ in freq_dist.most_common(vocab_size)])
+    # Remove newline characters
+    text = text.replace('\n', ' ')  # Replace newlines with a space
 
-    # Replace rare words with <UNK>
-    tokens = [word if word in vocabulary else '<UNK>' for word in tokens]
+    tokens = word_tokenize(text)  # Tokenize the text
+
+    # Filter out symbols and keep only alphanumeric tokens
+    tokens = [token for token in tokens if token.isalnum()]
 
     return tokens
+
+def process_text_files_in_folder(folder_path):
+    all_tokens = []
+
+    # Iterate over all files in the directory
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # Only process text files
+        if filename.endswith('.txt') and os.path.isfile(file_path):
+            print(f"Processing file: {filename}")
+            tokens = preprocess_data(file_path)
+            all_tokens.extend(tokens)  # Add tokens from this file to the combined list
+
+    return all_tokens
 
 def split_data(tokens):
     random.shuffle(tokens)

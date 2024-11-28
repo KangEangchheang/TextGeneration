@@ -10,9 +10,9 @@ class BackoffModel:
         for _ in range(num_words):
             # Ensure the context has exactly 3 words
             if len(context) < 3:
-                raise ValueError("Context must contain at least 3 words.")
+                return ["<Context must contain at least 3 words.>"]
             context = tuple(context[-3:])  # Last 3 words as the current context
-            print(f"Checking context: {context}")
+            # print(f"Checking context: {context}") #this is for example to print the context
 
             if context in ngram_model:
                 # Randomly choose a next word from the n-gram model

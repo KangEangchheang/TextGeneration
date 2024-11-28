@@ -11,10 +11,13 @@
         <h2>Group 2</h2>
         
         <input type="text" id="context" placeholder="Enter seed text">
-        <select id="model">
-            <option value="backoff">Backoff Model</option>
-            <option value="interpolation">Interpolation Model</option>
-        </select>
+        <div class="selection">
+            <select id="model">
+                <option value="backoff">Backoff Model</option>
+                <option value="interpolation">Interpolation Model</option>
+            </select>
+            <input id="word" type="text" placeholder="Enter amount of word">
+        </div>    
         <button id="genbutton" onclick="generateText()">Generate Text</button>
         <textarea id="output" readonly placeholder="Generated text will appear here"></textarea>
     </div>
@@ -22,6 +25,7 @@
         function generateText() {
             const context = document.getElementById('context').value;
             const model = document.getElementById('model').value;
+            const word = document.getElementById('word').value;
             const button = document.getElementById('genbutton');
              // Change button text and color while fetching
             button.innerHTML = "loading...";
@@ -30,7 +34,7 @@
             fetch('/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ context, model })
+                body: JSON.stringify({ context, model, word: word })
             })
             .then(response => response.json())
             .then(data => {
