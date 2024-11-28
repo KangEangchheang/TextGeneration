@@ -15,13 +15,17 @@
             <option value="backoff">Backoff Model</option>
             <option value="interpolation">Interpolation Model</option>
         </select>
-        <button onclick="generateText()">Generate Text</button>
+        <button id="genbutton" onclick="generateText()">Generate Text</button>
         <textarea id="output" readonly placeholder="Generated text will appear here"></textarea>
     </div>
     <script>
         function generateText() {
             const context = document.getElementById('context').value;
             const model = document.getElementById('model').value;
+            const button = document.getElementById('genbutton');
+             // Change button text and color while fetching
+            button.innerHTML = "loading...";
+            button.style.backgroundColor = "#FAD5A5";  // Use backgroundColor instead of background
 
             fetch('/generate', {
                 method: 'POST',
@@ -31,8 +35,15 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('output').value = data.generated_text;
+                button.innerHTML = "Generate Text"
+                button.style.backgroundColor = "#4CAF50";  // Reset the button color
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle error by resetting button in case of failure
+                button.innerHTML = "Generate Text";
+                button.style.backgroundColor = "#FF6347";  // Red color on error
+            });
         }
     </script>
 </body>

@@ -1,19 +1,31 @@
+
 from flask import Flask, request, jsonify, render_template
 from mobilelegend.backoffmodel import BackoffModel
 from mobilelegend.interpolationmodel import InterpolationModel
-from mobilelegend.preload import preprocess_data, build_ngrams
+from mobilelegend.preload import generate_4grams, preprocess_data, split_data
 
 
+# Load data and build ngrams
 tokens = preprocess_data('corpus.txt')
-ngrams = build_ngrams(tokens, n=4)
+train_data, validate_data, test_data = split_data(tokens)
+
+# Generate the 4-gram model
+ngram_model = generate_4grams(train_data)
+
+
+
+
+
+
+# Initialize models
+backoff_model = BackoffModel(ngram_model)
+print(ngram_model)
+# interpolation_model = InterpolationModel()
+
+
 
 
 app = Flask(__name__, template_folder='templates')
-
-# Initialize models
-backoff_model = BackoffModel(ngrams)
-interpolation_model = InterpolationModel(ngrams)
-
 
 @app.route('/')
 def index():
@@ -24,18 +36,24 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     data = request.json
-    context = data['context'].split()
-    model_type = data['model']
+    context = data.get('context', '').split()  # Ensure context is a list of words
+    model_type = data.get('model', 'backoff')  # Default to backoff if model not specified
     
     if model_type == 'backoff':
-        generated_word = backoff_model.generate(context)
-    elif model_type == 'interpolation':
-        generated_word = interpolation_model.generate(context)
+        generated_word = backoff_model.generate(ngram_model,context,10)
+    # elif model_type == 'interpolation':
+    #     generated_word = interpolation_model.generate(context)
     else:
         return jsonify({'generated_text': 'Something went wrong try again'}), 400
     
+    generated_text = ' '.join(context + generated_word)
     
-    return jsonify({'generated_text': generated_word}), 200
+    if(generated_word == 'Context must be exactly 3 words long for this model.'):   
+        return jsonify({'generated_text': "Context must be exactly 3 words long for this model."}), 500
+    
+    
+    
+    return jsonify({'generated_text': generated_text}), 200
 
 
 
