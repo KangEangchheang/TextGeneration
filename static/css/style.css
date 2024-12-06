@@ -49,6 +49,7 @@ textarea {
     resize: vertical; /* Allows the user to resize the textarea vertically */
     overflow: auto;   /* Allows scrolling if content exceeds the current size */
     min-height: 40px; /* Set a minimum height */
+    height: fit-content;
 }
 .selection {
     width: 100%;

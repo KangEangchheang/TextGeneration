@@ -12,6 +12,10 @@ backoff_model = BackoffNGramModel(max_n=4)
 backoff_model.build_model(train_token)
 
 
+inter_model = InterpolationModel(max_n=4,lambdas=[0.1, 0.2, 0.3, 0.4])
+inter_model.build_model(train_token)
+
+
 generated_word = ''
 app = Flask(__name__, template_folder='templates')
 
@@ -33,10 +37,10 @@ def generate():
         # Generate text
         generated_text = backoff_model.generate_text(seed=context, length=int(words))
         
+         
+    elif model_type == 'interpolation':
+        generated_text = inter_model.generate_text(seed=context, length=int(words))
         
-        
-    # elif model_type == 'interpolation':
-    #     generated_word = interpolation_model.generate(context)
     else:
         return jsonify({'generated_text': 'Something went wrong try again'}), 400
     
