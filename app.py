@@ -1,41 +1,18 @@
 
-import random
 from flask import Flask, request, jsonify, render_template
-from mobilelegend.backoffmodel import BackoffModel
+from mobilelegend.backoffmodel import BackoffNGramModel
 from mobilelegend.interpolationmodel import InterpolationModel
-from mobilelegend.preload import generate_4grams, process_text_files_in_folder, split_data
+from mobilelegend.preload import process_text_files_in_folder
 
 
-# Load data and build ngrams
-tokens = process_text_files_in_folder('./corpus')
-train_data, validate_data, test_data = split_data(tokens)
+# get token
+train_token, val_token, test_token = process_text_files_in_folder('./corpus')
 
-# Generate the 4-gram model
-ngram_model = generate_4grams(train_data)
-
+backoff_model = BackoffNGramModel(max_n=4)
+backoff_model.build_model(train_token)
 
 
-
-
-
-# Initialize models
-backoff_model = BackoffModel(ngram_model)
-# interpolation_model = InterpolationModel()
-
-
-
-# display random ngram for example to test
-random_ngrams = random.sample(list(ngram_model.items()), 10)
-
-# Print out the context (without the next word)
-for ngram_tuple, next_words in random_ngrams:
-    # Join the context tuple into a string and print it
-    context = ' '.join(ngram_tuple)
-    print(f"Context: {context}")
-
-
-
-
+generated_word = ''
 app = Flask(__name__, template_folder='templates')
 
 @app.route('/')
@@ -52,15 +29,25 @@ def generate():
     words = data.get('word', 30)
     
     if model_type == 'backoff':
-        generated_word = backoff_model.generate(ngram_model,context, int(words))
+        context = tuple(context[-(backoff_model.max_n - 1):])
+        # Generate text
+        generated_text = backoff_model.generate_text(seed=context, length=int(words))
+        
+        
+        
     # elif model_type == 'interpolation':
     #     generated_word = interpolation_model.generate(context)
     else:
         return jsonify({'generated_text': 'Something went wrong try again'}), 400
     
-    generated_text = ' '.join(context + generated_word)
-    
     return jsonify({'generated_text': generated_text}), 200
+
+
+
+
+
+
+
 
 
 

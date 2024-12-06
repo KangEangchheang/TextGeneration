@@ -45,6 +45,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 // Handle error by resetting button in case of failure
+                document.getElementById('output').value = "error";
                 button.innerHTML = "Generate Text";
                 button.style.backgroundColor = "#FF6347";  // Red color on error
             });
