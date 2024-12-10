@@ -1,8 +1,8 @@
 
 from flask import Flask, request, jsonify, render_template
-from mobilelegend.backoffmodel import BackoffNGramModel
-from mobilelegend.interpolationmodel import InterpolationModel
-from mobilelegend.preload import process_text_files_in_folder
+from models.backoffmodel import BackoffNGramModel
+from models.interpolationmodel import InterpolationModel
+from models.preload import process_text_files_in_folder
 
 
 # get token

@@ -52,6 +52,6 @@ class BackoffNGramModel:
             else:
                 # If no match is found, choose a random word (default to unigram)
                 next_word = random.choice(list(self.models[1][()].keys()))
-                text.append(next_word)
+                text.append(next_word + '. ')
 
         return ' '.join(text)
